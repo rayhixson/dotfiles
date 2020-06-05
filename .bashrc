@@ -31,16 +31,8 @@ export CLICOLOR=1
 export LSCOLORS=dxfxcxdxbxegedabagacad
 # export LSCOLORS=ExFxBxDxCxegedabagacad
 
-# for ttc admin:
-export NODE_ENV=development
-
-export LOGNAME=ray
-
-export PGSQL_ROOT="/Applications/Postgres.app/Contents/Versions/10/bin"
-export ELASTIC_URI="http://localhost:9200"
-export PGSQL_HOME=/Applications/Postgres.app/Contents/Versions/10
-
 export ESHELL=$SHELL
+
 export HISTIGNORE="&:ls:[bf]g:exit:cu:h:cd*"
 export HISTFILE="~/.history_bash"
 export HISTSIZE=1000000
@@ -62,10 +54,16 @@ fi
 
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
-export GODEBUG=cgocheck=0
-export C_INCLUDE_PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/libxml2
-export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
-export BATCH_ELASTICURI="http://localhost:9200"
+export MYSQLHOME=/usr/local/mysql
+export PATH="$PATH:$GOROOT/bin:$GOPATH/bin:$MYSQLHOME/bin"
+
+export QAPROPS=props/rays.properties
+export APPURL=http://localhost:9091/svc/appmap/apps-local.xml
+export APP=minimal-hle
+export CTPSVC=ctp
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/
+
+export PATH="$PATH:$HOME/dev/google-cloud-sdk/bin"
 
 if [ -f `brew --prefix`/etc/bash_completion ]; then
     . `brew --prefix`/etc/bash_completion
@@ -81,7 +79,7 @@ function log {
 		LIMIT=$1
 	fi
 
-    git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+	git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
 	#git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short --max-count=$LIMIT
 }
 
@@ -133,16 +131,10 @@ function re {
 function clean {
     find . -name "*~" | xargs rm
     find . -name "\.#*" | xargs rm
-	find ~/go/src/github.com/treetopllc/gonoble/ext/cucumber/logs -type f -exec rm {} +;
-	find . -iregex ".*gonoble-integration.[a-z][a-z][a-z]" -exec rm {} +;
 }
 
 function xgrep {
 	echo "perl -lne 'BEGIN{undef $/} while (/<tag>(.*?)<\/tag>/sg){print \$1}' FILENAME"
-}
-
-function gocd {
-	cd ~/go/src/github.com/treetopllc/$1
 }
 
 function enw {
@@ -155,34 +147,15 @@ function v {
     )
 }
 
-tcuc() {
-    TRACE_REQUESTS="true" cucumber $*
-}
-
-cleancuc() {
-    (cd ~/go/src/github.com/treetopllc/gonoble/ext/database;
-     DB=noblegraph_clean make drop_db create_db clean_bootstrap)
-    DB=noblegraph_clean cucumber $*
-}
-
-alias cuc="DB=noblegraph_clean cucumber -p norm $*"
-alias cucre="DB=noblegraph_clean cucumber -p re $*"
-alias cucint="DB=noblegraph_clean cucumber -p integration $*"
+alias ls="ls -hF"
 alias ll="ls -lhF"
 alias la="ls -lAhF"
 alias h="history 40 |awk '{print \$2\" \"\$3\" \"\$4\" \"\$5\" \"\$6\" \"\$7\" \"\$8\" \"\$9}'"
 alias gs="git status"
 alias gd="git dump"
 alias grep="grep --color=auto"
-# alias giv="/usr/local/go/bin/go install -ldflags=-s -v"
 alias giv="/usr/local/go/bin/go install -v"
-alias connect-staging="PGHOST=staging-pgsql.noblehour.com DBUSER=gonoble DB=noblegraph DBPASS=monkey1234 make connect"
-alias makeddf="make distclean deps frontend"
-
-alias setdns="sudo networksetup -setdnsservers Wi-Fi 8.8.8.8 8.8.4.4"
-alias do_i_need_to_do_this_again="VBoxManage guestproperty set \"cloudrecipes_default_1456952104473_15528\" \"/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold\" 1000"
-
-alias run-sa="gulp serve-5000-only"
+alias tf="terraform"
 
 # validate json
 validatejson() {
@@ -195,12 +168,26 @@ export NVM_DIR="/Users/ray/.nvm"
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
 
 
-alias connect-staging-db="ssh wikkit; ssh utility; cd gonoble/ext/database; rm pgpass && PGHOST=staging-pgsql.noblehour.com DBUSER=gonoble DB=noblegraph DBPASS=monkey1234 make pgpass connect"
-
 alias ecr-login='aws ecr get-login --no-include-email --region us-east-1 |sh'
 alias docker-debug='docker run -P -i -t --rm --env OPENV=dev --env CONSUL_PARAMS="-retry-join 192.168.2.6" batch-svc:latest'
 alias d=docker
 alias dc="docker container"
 
-. ~/homedepot/ray/consul_ip.sh
+function startCtp {
+    (
+	cd ~/dev/chockstone/master
+	./gradlew tarApps
+	./gradlew :appmap-server:deploy :aladdin:deploy
+	cd ~/dev/chockstone
+	./bin/start-appmap.sh
+	./bin/redeploy-genie.sh
+	cd ~/dev/chockstone/aladdin
+	./bin/run.sh
+    )
+}
+
+alias meghanada-server="java -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Xverify:none -Xms256m -Dfile.encoding=UTF-8 -jar dev/meghanada-server/server/build/libs/meghanada-1.3.0.jar"
+
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+complete -C /usr/local/bin/terraform terraform
