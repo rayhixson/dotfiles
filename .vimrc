@@ -27,4 +27,3 @@
 :set statusline+=%l/%L   "cursor line/total lines
 :set statusline+=\ %P    "percent through file
 
-execute pathogen#infect()

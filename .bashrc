@@ -1,9 +1,5 @@
 # .bashrc
 
-if [ -f ~/.keys ]; then
-    . ~/.keys
-fi
-
 PROMPT_COMMAND=
 
 # Terminal colours (after installing GNU coreutils)
@@ -24,8 +20,6 @@ IN="[\033[0m]"
 export GIT_PS1_SHOWDIRTYSTATE=true
 export GIT_PS1_SHOWUNTRACKEDFILES=true
 export GIT_PS1_SHOWSTASHSTATE=true
-
-export HOMEBREW_GITHUB_API_TOKEN="e2bdad238fb5361fda018a9ab29bb424e78b5776"
 
 export CLICOLOR=1
 export LSCOLORS=dxfxcxdxbxegedabagacad
@@ -52,6 +46,8 @@ if [ "$TERM" = dumb ] && [ "$INSIDE_EMACS" ]; then
     export TERM=dumb-emacs-ansi COLORTERM=1
 fi
 
+export AWS_SDK_LOAD_CONFIG=True
+
 export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export MYSQLHOME=/usr/local/mysql
@@ -59,15 +55,40 @@ export PATH="$PATH:$GOROOT/bin:$GOPATH/bin:$MYSQLHOME/bin"
 
 export QAPROPS=props/rays.properties
 export APPURL=http://localhost:9091/svc/appmap/apps-local.xml
-export APP=minimal-hle
+export APP=minimal-ray
 export CTPSVC=ctp
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home/
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home
+export CHOCROOT=$HOME/dev/chockstone
+export CHOCTOP=$CHOCROOT/ctp-svc
+
+# these affect the version.txt files generated for aladding viewing
+export JOB_NAME="RaysLocal"
 
 export PATH="$PATH:$HOME/dev/google-cloud-sdk/bin"
 
-if [ -f `brew --prefix`/etc/bash_completion ]; then
-    . `brew --prefix`/etc/bash_completion
-fi
+alias ls="ls -hF"
+alias ll="ls -lhF"
+alias la="ls -lAhF"
+alias h="history 40 |awk '{print \$2\" \"\$3\" \"\$4\" \"\$5\" \"\$6\" \"\$7\" \"\$8\" \"\$9}'"
+alias gs="git status"
+alias gd="git dump"
+alias grep="grep --color=auto"
+alias giv="/usr/local/go/bin/go install -v"
+
+alias ecr-login='aws ecr get-login --no-include-email --region us-east-1 |sh'
+alias docker-debug='docker run -P -i -t --rm --env OPENV=dev --env CONSUL_PARAMS="-retry-join 192.168.2.6" batch-svc:latest'
+alias d=docker
+alias dc="docker container"
+
+alias meghanada-server="java -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Xverify:none -Xms256m -Dfile.encoding=UTF-8 -jar dev/meghanada-server/server/build/libs/meghanada-1.3.0.jar"
+
+function tf() {
+    if [ "$1" == "plan" ] || [ "$1" == "apply" ]; then
+	terraform $1 -var-file=$HOME/rays_vars.tfvars
+    else
+	terraform $*
+    fi
+}
 
 function oe {
 	open /Applications/Emacs.app
@@ -97,17 +118,17 @@ function ex {
 }
 
 function f {
-	if [ "$1" == "" ]; then
-		echo "usage: "
-		echo "f <filename>"
-		echo "f <filenames> <arg>"
+    if [ "$1" == "" ]; then
+	echo "usage: "
+	echo "f <filename>"
+	echo "f <filenames> <arg>"
+    else
+	if [ "$2" != "" ]; then
+	    ag --group --line-number --smart-case -G $1 "$2" .
 	else
-		if [ "$2" != "" ]; then
-			find . -type f -iname "$1" -exec grep -l "$2" {} +
-		else
-			find . -iname "$*" 2>/dev/null
-		fi
+	    ag --group --line-number --smart-case "$1" .
 	fi
+    fi
 }
 
 function fig {
@@ -131,6 +152,7 @@ function re {
 function clean {
     find . -name "*~" | xargs rm
     find . -name "\.#*" | xargs rm
+    find $CHOCROOT/apps -regex ".*/*.log.[0-9]" -exec rm {} \;
 }
 
 function xgrep {
@@ -147,46 +169,32 @@ function v {
     )
 }
 
-alias ls="ls -hF"
-alias ll="ls -lhF"
-alias la="ls -lAhF"
-alias h="history 40 |awk '{print \$2\" \"\$3\" \"\$4\" \"\$5\" \"\$6\" \"\$7\" \"\$8\" \"\$9}'"
-alias gs="git status"
-alias gd="git dump"
-alias grep="grep --color=auto"
-alias giv="/usr/local/go/bin/go install -v"
-alias tf="terraform"
+function startCtp {
+    (
+	cd $CHOCROOT/master
+	./gradlew tarApps
+	./gradlew :appmap-server:deploy :aladdin:deploy
+	cd $CHOCROOT
+	./bin/start-appmap.sh
+	./bin/redeploy-genie.sh
+	cd $CHOCROOT/aladdin
+	./bin/run.sh
+    )
+}
 
 # validate json
 validatejson() {
     "curl -s -X POST -d @swagger.json -H 'Content-Type:application/json' http://online.swagger.io/validator/debug"
 }
 
+if [ -f `brew --prefix`/etc/bash_completion ]; then
+    . `brew --prefix`/etc/bash_completion
+fi
+
 export NVM_DIR="/Users/ray/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
 
 export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
-
-alias ecr-login='aws ecr get-login --no-include-email --region us-east-1 |sh'
-alias docker-debug='docker run -P -i -t --rm --env OPENV=dev --env CONSUL_PARAMS="-retry-join 192.168.2.6" batch-svc:latest'
-alias d=docker
-alias dc="docker container"
-
-function startCtp {
-    (
-	cd ~/dev/chockstone/master
-	./gradlew tarApps
-	./gradlew :appmap-server:deploy :aladdin:deploy
-	cd ~/dev/chockstone
-	./bin/start-appmap.sh
-	./bin/redeploy-genie.sh
-	cd ~/dev/chockstone/aladdin
-	./bin/run.sh
-    )
-}
-
-alias meghanada-server="java -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Xverify:none -Xms256m -Dfile.encoding=UTF-8 -jar dev/meghanada-server/server/build/libs/meghanada-1.3.0.jar"
 
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
