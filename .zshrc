@@ -1,229 +1,112 @@
-#!/bin/zsh
-
-# .zshrc
-
-if [ -f ~/.keys ]; then
-    . ~/.keys
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-PROMPT_COMMAND=
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
 
-# Terminal colours (after installing GNU coreutils)
-NM="[\033[0;38m]" # means no background and white lines
-HI="[\033[0;37m]" # change this for letter colors
-HII="[\033[0;31m]" # change this for letter colors
-SI="[\033[0;33m]" # this is for the current directory
-IN="[\033[0m]"
+# Path to your oh-my-zsh installation.
+export ZSH="/Users/ray/.oh-my-zsh"
 
-# Key repeat back on:
-# defaults write -g ApplePressAndHoldEnabled -bool false
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time oh-my-zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+# ZSH_THEME="powerlevel10k"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
-# export PS1="\$(date +%H%M) \u ${bold_on}\w${bold_off} > "
-# export PS1="\$(date +%H%M) \u ${bold_on}\w${bold_off}\$(__git_ps1) > "
-#export PS1="\[\033[36m\]\u\[\033[m\] \[\033[33;1m\]\w\[\033[m\] > "
-. ~/.twoline_prompt.sh
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in $ZSH/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-13.0.2.jdk/Contents/Home"
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
 
-export GIT_PS1_SHOWDIRTYSTATE=true
-export GIT_PS1_SHOWUNTRACKEDFILES=true
-export GIT_PS1_SHOWSTASHSTATE=true
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
 
-export HOMEBREW_GITHUB_API_TOKEN="e2bdad238fb5361fda018a9ab29bb424e78b5776"
+# Uncomment the following line to disable bi-weekly auto-update checks.
+# DISABLE_AUTO_UPDATE="true"
 
-export CLICOLOR=1
-export LSCOLORS=dxfxcxdxbxegedabagacad
-# export LSCOLORS=ExFxBxDxCxegedabagacad
+# Uncomment the following line to automatically update without prompting.
+# DISABLE_UPDATE_PROMPT="true"
 
-# for ttc admin:
-export NODE_ENV=development
+# Uncomment the following line to change how often to auto-update (in days).
+# export UPDATE_ZSH_DAYS=13
 
-export LOGNAME=ray
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS=true
 
-export PGSQL_ROOT="/Applications/Postgres.app/Contents/Versions/10/bin"
-export ELASTIC_URI="http://localhost:9200"
-export PGSQL_HOME=/Applications/Postgres.app/Contents/Versions/10
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
 
-export ESHELL=$SHELL
-export HISTIGNORE="&:ls:[bf]g:exit:cu:h:cd*"
-export HISTFILE="~/.history_bash"
-export HISTSIZE=1000000
-export HISTFILESIZE=1000000
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
 
-#if [ -z "$INSIDE_EMACS" ]; then
-#	bold_on="\[\033[01m\]"
-#	bold_off="\[\033[0m\]"
-#else
-#	bold_on=
-#	bold_off=
-#	export PS1="\u \w > "
-#fi
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
 
-if [ "$TERM" = dumb ] && [ "$INSIDE_EMACS" ]; then
-    export TERM=dumb-emacs-ansi COLORTERM=1
-fi
+# Uncomment the following line to display red dots whilst waiting for completion.
+# COMPLETION_WAITING_DOTS="true"
 
-export PATH="$HOME/homedepot/ray:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/sbin:/usr/local/bin"
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
 
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export GODEBUG=cgocheck=0
-export C_INCLUDE_PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/libxml2
-export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
-export BATCH_ELASTICURI="http://localhost:9200"
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
 
-export PATH="$PATH:~/homedepot/brian/bin:~/homedepot/ray/bin"
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
 
-if [ -f `brew --prefix`/etc/zsh_completion ]; then
-    . `brew --prefix`/etc/zsh_completion
-fi
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git zsh-autosuggestions autojump)
 
-function oe {
-	open /Applications/Emacs.app
-}
+source $ZSH/oh-my-zsh.sh
 
-function log {
-	LIMIT=10
-	if [ -n "$1" ]; then
-		LIMIT=$1
-	fi
+# User configuration
 
-    git log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
-	#git log --pretty=format:"%h %ad | %s%d [%an]" --graph --date=short --max-count=$LIMIT
-}
+# export MANPATH="/usr/local/man:$MANPATH"
 
-function pgrep {
-	ps -wax|grep $*
-}
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
 
-function jtags {
-	find . -name "*.java" |etags -o TAGS -
-}
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='mvim'
+# fi
 
-function ex {
-	echo "export $1=$2"
-	export $1=$2
-}
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
 
-function f {
-	if [ "$1" == "" ]; then
-		echo "usage: "
-		echo "f <filename>"
-		echo "f <filenames> <arg>"
-	else
-		if [ "$2" != "" ]; then
-			find . -type f -iname "$1" -exec grep -l "$2" {} +
-		else
-			find . -iname "$*" 2>/dev/null
-		fi
-	fi
-}
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
 
-function fig {
-	if [ "$1" == "" ]; then
-		echo "usage: "
-		echo "f <filename>"
-		echo "f <filenames> <arg>"
-	else
-		if [ "$2" != "" ]; then
-			find . -type f -name "$1" -exec grep -l -i "$2" {} +
-		else
-			find . -name "$*" 2>/dev/null
-		fi
-	fi
-}
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-function re {
-    . ~/.zshrc
-}
-
-function clean {
-    find . -name "*~" | xargs rm
-    find . -name "\.#*" | xargs rm
-	find ~/go/src/github.com/treetopllc/gonoble/ext/cucumber/logs -type f -exec rm {} +;
-	find . -iregex ".*gonoble-integration.[a-z][a-z][a-z]" -exec rm {} +;
-}
-
-function xgrep {
-	echo "perl -lne 'BEGIN{undef $/} while (/<tag>(.*?)<\/tag>/sg){print \$1}' FILENAME"
-}
-
-function gocd {
-	cd ~/go/src/github.com/treetopllc/$1
-}
-
-function enw {
-	/Applications/Emacs.app/Contents/MacOS/Emacs -nw --no-desktop $*
-}
-
-function v {
-    (cd ~/treetop/cloudrecipes
-     vagrant ssh
-    )
-}
-
-tcuc() {
-    TRACE_REQUESTS="true" cucumber $*
-}
-
-cleancuc() {
-    (cd ~/go/src/github.com/treetopllc/gonoble/ext/database;
-     DB=noblegraph_clean make drop_db create_db clean_bootstrap)
-    DB=noblegraph_clean cucumber $*
-}
-
-alias code="/Applications/Visual\ Studio\ Code.app/Contents/MacOS/Electron"
-alias cuc="DB=noblegraph_clean cucumber -p norm $*"
-alias cucre="DB=noblegraph_clean cucumber -p re $*"
-alias cucint="DB=noblegraph_clean cucumber -p integration $*"
-alias ll="ls -lhF"
-alias la="ls -lAhF"
-alias h="history 40 |awk '{print \$2\" \"\$3\" \"\$4\" \"\$5\" \"\$6\" \"\$7\" \"\$8\" \"\$9}'"
-alias gs="git status"
-alias gd="git dump"
-alias grep="grep --color=auto"
-# alias giv="/usr/local/go/bin/go install -ldflags=-s -v"
-alias giv="/usr/local/go/bin/go install -v"
-alias connect-staging="PGHOST=staging-pgsql.noblehour.com DBUSER=gonoble DB=noblegraph DBPASS=monkey1234 make connect"
-alias makeddf="make distclean deps frontend"
-
-alias setdns="sudo networksetup -setdnsservers Wi-Fi 8.8.8.8 8.8.4.4"
-alias do_i_need_to_do_this_again="VBoxManage guestproperty set \"cloudrecipes_default_1456952104473_15528\" \"/VirtualBox/GuestAdd/VBoxService/--timesync-set-threshold\" 1000"
-
-alias run-sa="gulp serve-5000-only"
-
-alias nw="cd ~/go/src/github.com/treetopllc/nobleweb"
-alias mddf="make distclean deps frontend"
-alias rr="nw && cd react && npm run dev"
-alias killn='pkill -9 -c -f ./nobleweb'
-alias stopn='sudo systemctl disable nobleweb | sudo systemctl stop nobleweb | killn'
-alias psn='ps aux | grep nobleweb'
-alias nws='./nobleweb -mode=development -config=config.staging.json -port=8081'
-alias nwi='./nobleweb -mode=development -config=config.integration.json -port=8081'
-
-# validate json
-validatejson() {
-    "curl -s -X POST -d @swagger.json -H 'Content-Type:application/json' http://online.swagger.io/validator/debug"
-}
-
-export NVM_DIR="/Users/ray/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
-PYTHON_HOME="/Users/ray/Library/Python/3.7"
-export PATH="$PYTHON_HOME/bin:$PATH"
-
-alias connect-staging-db="ssh wikkit; ssh utility; cd gonoble/ext/database; rm pgpass && PGHOST=staging-pgsql.noblehour.com DBUSER=gonoble DB=noblegraph DBPASS=monkey1234 make pgpass connect"
-
-alias ecr-login='aws ecr get-login --no-include-email --region us-east-1 |sh'
-alias docker-debug='docker run -P -i -t --rm --env OPENV=dev --env CONSUL_PARAMS="-retry-join 0.0.0.0" batch-svc:latest'
-alias d=docker
-alias dc="docker container"
-
-source ~/homedepot/ray/env-nomad-consul
-
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /usr/local/bin/terraform terraform
+source ~/dotfiles/.my-shell-configs

@@ -9,7 +9,7 @@ RED="\[\033[0;31m\]"
 GREEN="\[\033[01;32m\]"
 BLUE="\[\033[01;36m\]"
 YELLOW="\[\033[0;33m\]"
- 
+
 PS_LINE=`printf -- '- %.0s' {1..10}`
 function parse_git_branch {
   PS_BRANCH=''
@@ -25,7 +25,8 @@ function parse_git_branch {
   PS_BRANCH="(git ${ref#refs/heads/}) "
 }
 PROMPT_COMMAND=parse_git_branch
-PS_INFO="$GREEN\u@\h$RESET $BLUE\w"
+#PS_INFO="$GREEN\u@\h$RESET $BLUE\w"
+PS_INFO="$BLUE\w"
 PS_GIT="$YELLOW\$PS_BRANCH"
 PS_TIME="$RED[\t]"
 
