@@ -14,8 +14,8 @@ export HISTSIZE=1000000
 export HISTFILESIZE=1000000
 shopt -s histappend
 
-if [ "$TERM" = dumb ] && [ "$INSIDE_EMACS" ]; then
-    export TERM=dumb-emacs-ansi COLORTERM=1
+if [ -n "$INSIDE_EMACS" ]; then
+    export TERM=xterm-256color
 fi
 
 [[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"

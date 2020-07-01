@@ -1,7 +1,7 @@
 #!/bin/bash
 # keep this generic to either zsh or bash
 
-export ESHELL=$SHELL
+export ESHELL=/bin/bash
 
 export AWS_SDK_LOAD_CONFIG=True
 
