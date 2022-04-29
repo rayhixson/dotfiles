@@ -1,5 +1,10 @@
 # .bashrc
 
+if [ -f $(brew --prefix)/etc/bash_completion ]; then
+   . $(brew --prefix)/etc/bash_completion
+fi
+
+
 PROMPT_COMMAND=
 
 . ~/.bash_twoline_prompt.sh
@@ -25,4 +30,7 @@ complete -C /usr/local/bin/terraform terraform
 # terrform docs
 source <(terraform-docs completion bash)
 
-source ~/dotfiles/.my-shell-configs
+source ~/dotfiles/my-shell-configs.sh
+source ~/dotfiles/my-bash-functions.sh
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

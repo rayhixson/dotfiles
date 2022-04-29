@@ -1,48 +1,3 @@
-#!/bin/bash
-# keep this generic to either zsh or bash
-
-export ESHELL=/bin/bash
-
-export AWS_SDK_LOAD_CONFIG=True
-
-export GOROOT=/usr/local/go
-export GOPATH=$HOME/go
-export MYSQLHOME=/usr/local/mysql
-export PATH="$PATH:$GOROOT/bin:$GOPATH/bin:$MYSQLHOME/bin"
-
-export QAPROPS=props/rays.properties
-export APPURL=http://localhost:9091/svc/appmap/apps-local.xml
-export APP=minimal-ray
-export CTPSVC=ctp
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home
-export CHOCROOT=$HOME/dev/chockstone
-export CHOCTOP=$CHOCROOT/ctp-svc
-
-# these affect the version.txt files generated for aladding viewing
-export JOB_NAME="RaysLocal"
-
-export PATH="$PATH:$HOME/dev/google-cloud-sdk/bin"
-
-alias ls="ls -hF"
-alias ll="ls -lhF"
-alias la="ls -lAhF"
-# alias h="history 40 |awk '{print \$2\" \"\$3\" \"\$4\" \"\$5\" \"\$6\" \"\$7\" \"\$8\" \"\$9}'"
-alias h="history"
-alias gs="git status"
-alias gd="git dump"
-alias grep="grep --color=auto"
-alias giv="/usr/local/go/bin/go install -v"
-
-alias ecr-login='aws ecr get-login --no-include-email --region us-east-1 |sh'
-alias docker-debug='docker run -P -i -t --rm --env OPENV=dev --env CONSUL_PARAMS="-retry-join 192.168.2.6" batch-svc:latest'
-alias d=docker
-alias dc="docker container"
-
-alias meghanada-server="java -XX:+UseConcMarkSweepGC -XX:SoftRefLRUPolicyMSPerMB=50 -Xverify:none -Xms256m -Dfile.encoding=UTF-8 -jar dev/meghanada-server/server/build/libs/meghanada-1.3.0.jar"
-
-alias tf="terraform"
-alias tfdebug="TF_LOG=TRACE terraform $*"
-
 function tfa() {
     if [ "$1" == "plan" ] || [ "$1" == "apply" ]; then
 	terraform $1 -var-file=$HOME/rays_vars.tfvars
@@ -139,8 +94,57 @@ function startCtp {
     )
 }
 
+function tags {
+	(cd ~/dev/chockstone
+	 rm .TAGS && find . -name "*.java" -exec etags -a -o .TAGS {} \;)
+}
+
 # validate json
 validatejson() {
     "curl -s -X POST -d @swagger.json -H 'Content-Type:application/json' http://online.swagger.io/validator/debug"
 }
 
+rejib() {
+    VERSION=$1
+    export BUILD_NUMBER=${VERSION} && ./gradlew :valutec-translator-svc:jib
+}
+
+setBuild() {
+    export BUILD_NUMBER=$1
+    sed -i bak "s/tag: \".*\"/tag: \"${BUILD_NUMBER}\"/" ~/dev/chockstone/deployment/vtt/values.yaml
+}
+
+setPods() {
+    export POD_NAME_xrefsvc=$(kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep xref)
+    export POD_NAME_vtt=$(kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep vtt)
+    export POD_NAME_idsvc=$(kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep id-svc)
+}
+
+logs() {
+    SVC=$1
+    POD_NAME=$(kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}' | grep $SVC )
+    kubectl logs ${POD_NAME} -c ${SVC}
+}
+
+jlogs() {
+    SVC=$1
+    logs $SVC | grep '^{' | jq .message
+}
+
+re() {
+    . ~/.bashrc
+}
+
+switch-java() {
+    if [ "$1" == "8" ]; then
+        export JAVA_HOME=/Library/Java/JavaVirtualMachines/adoptopenjdk-8.jdk/Contents/Home
+    else
+        export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.0.1.jdk/Contents/Home
+    fi
+    echo $JAVA_HOME
+    export PATH=$JAVA_HOME/bin:$PATH
+}
+
+scp-onprem() {
+	gcloud beta compute scp --zone us-east1-b --tunnel-through-iap $1 chockstone-onprem-test:$2
+}
